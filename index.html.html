@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emerging Markets Returns</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      min-height: 100vh;
+      padding: 16px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      color: #fff;
+      text-align: center;
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+    
+    .subtitle {
+      color: #9ca3af;
+      text-align: center;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .selected-indicator {
+      text-align: center;
+      margin-bottom: 12px;
+      min-height: 28px;
+    }
+    
+    .selected-badge {
+      display: inline-block;
+      background: #eab308;
+      color: #000;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .table-wrapper {
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+    }
+    
+    table {
+      border-collapse: collapse;
+      font-size: 9px;
+    }
+    
+    th {
+      padding: 6px 3px;
+      background: #1e293b;
+      color: #fff;
+      font-weight: bold;
+      border: 1px solid #475569;
+      min-width: 50px;
+      font-size: 10px;
+    }
+    
+    td {
+      padding: 3px 4px;
+      border: 1px solid #475569;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      min-width: 50px;
+    }
+    
+    td:hover {
+      box-shadow: inset 0 0 0 1px #fff;
+    }
+    
+    td.selected {
+      box-shadow: inset 0 0 0 2px #facc15;
+    }
+    
+    td.dimmed {
+      opacity: 0.3;
+    }
+    
+    .country {
+      font-weight: bold;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+    
+    .return-val {
+      font-size: 8px;
+      line-height: 1.2;
+    }
+    
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+    
+    .legend-label {
+      color: #9ca3af;
+      font-size: 9px;
+    }
+    
+    .source {
+      color: #6b7280;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 10px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Emerging Markets Returns</h1>
+    <p class="subtitle">🖱️ 국가 티커 클릭 → 해당 국가 연도별 성과 하이라이트</p>
+    
+    <div class="selected-indicator" id="selectedIndicator"></div>
+    
+    <div class="table-wrapper">
+      <table id="emTable"></table>
+    </div>
+    
+    <div class="legend">
+      <div class="legend-item"><div class="legend-color" style="background:#14532d"></div><span class="legend-label">≥80%</span></div>
+      <div class="legend-item"><div class="legend-color" style="background:#166534"></div><span class="legend-label">50-80%</span></div>
+      <div class="legend-item"><div class="legend-color" style="background:#22c55e"></div><span class="legend-label">30-50%</span></div>
+      <div class="legend-item"><div class="legend-color" style="background:#4ade80"></div><span class="legend-label">20-30%</span></div>
+      <div class="legend-item"><div class="legend-color" style="background:#86efac"></div><span class="legend-label">10-20%</span></div>
+      <div class="legend-item"><div class="legend-color" style="background:#dcfce7"></div><span class="legend-label">0-10%</span></div>
+      <div class="legend-item"><div class="legend-color" style="background:#fecaca"></div><span class="legend-label">-10-0%</span></div>
+      <div class="legend-item"><div class="legend-color" style="background:#f87171"></div><span class="legend-label">-20--10%</span></div>
+      <div class="legend-item"><div class="legend-color" style="background:#ef4444"></div><span class="legend-label">-30--20%</span></div>
+      <div class="legend-item"><div class="legend-color" style="background:#7f1d1d"></div><span class="legend-label">≤-40%</span></div>
+    </div>
+    
+    <p class="source">Source: Bespoke Investment Group</p>
+  </div>
+
+  <script>
+    // 정확한 데이터
+    const rowData = [
+      { 2011: {c:'QAT',v:8.2}, 2012: {c:'TUR',v:64.9}, 2013: {c:'ARE',v:90.0}, 2014: {c:'EGY',v:29.4}, 2015: {c:'HUN',v:36.3}, 2016: {c:'BRA',v:66.8}, 2017: {c:'POL',v:55.3}, 2018: {c:'QAT',v:29.8}, 2019: {c:'GRC',v:43.6}, 2020: {c:'KOR',v:45.2}, 2021: {c:'CZE',v:58.1}, 2022: {c:'TUR',v:91.2}, 2023: {c:'HUN',v:50.9}, 2024: {c:'TWN',v:35.1}, 2025: {c:'COL',v:115.8}, ann: {c:'TWN',v:13.0} },
+      { 2011: {c:'IDN',v:6.5}, 2012: {c:'PHL',v:47.6}, 2013: {c:'GRC',v:52.7}, 2014: {c:'IDN',v:27.2}, 2015: {c:'IND',v:-6.1}, 2016: {c:'PER',v:55.6}, 2017: {c:'CHN',v:54.3}, 2018: {c:'SAU',v:19.2}, 2019: {c:'EGY',v:42.1}, 2020: {c:'TWN',v:42.0}, 2021: {c:'ARE',v:50.2}, 2022: {c:'CHL',v:22.6}, 2023: {c:'GRC',v:49.7}, 2024: {c:'MYS',v:20.8}, 2025: {c:'KOR',v:100.8}, ann: {c:'ARE',v:10.5} },
+      { 2011: {c:'MYS',v:0.1}, 2012: {c:'EGY',v:47.1}, 2013: {c:'SAU',v:32.2}, 2014: {c:'PHL',v:26.4}, 2015: {c:'PHL',v:-6.3}, 2016: {c:'HUN',v:35.4}, 2017: {c:'KOR',v:47.8}, 2018: {c:'KWT',v:15.4}, 2019: {c:'SAU',v:39.3}, 2020: {c:'CHN',v:29.7}, 2021: {c:'SAU',v:37.9}, 2022: {c:'BRA',v:14.6}, 2023: {c:'POL',v:49.5}, 2024: {c:'CHN',v:19.7}, 2025: {c:'GRC',v:83.1}, ann: {c:'CZE',v:9.0} },
+      { 2011: {c:'PHL',v:0.1}, 2012: {c:'POL',v:41.0}, 2013: {c:'QAT',v:30.0}, 2014: {c:'IND',v:23.9}, 2015: {c:'KOR',v:-6.3}, 2016: {c:'THA',v:27.0}, 2017: {c:'CHL',v:43.6}, 2018: {c:'PER',v:1.6}, 2019: {c:'TWN',v:37.7}, 2020: {c:'EM',v:18.7}, 2021: {c:'KWT',v:30.9}, 2022: {c:'KWT',v:10.1}, 2023: {c:'EGY',v:41.8}, 2024: {c:'ARE',v:19.6}, 2025: {c:'HUN',v:78.9}, ann: {c:'HUN',v:8.5} },
+      { 2011: {c:'SAU',v:-2.4}, 2012: {c:'COL',v:35.9}, 2013: {c:'TWN',v:9.8}, 2014: {c:'TUR',v:19.1}, 2015: {c:'CHN',v:-7.6}, 2016: {c:'COL',v:26.5}, 2017: {c:'HUN',v:40.0}, 2018: {c:'BRA',v:-0.2}, 2019: {c:'KWT',v:35.8}, 2020: {c:'IND',v:15.9}, 2021: {c:'TWN',v:26.8}, 2022: {c:'PER',v:9.4}, 2023: {c:'MEX',v:41.5}, 2024: {c:'TUR',v:18.2}, 2025: {c:'ZAF',v:78.7}, ann: {c:'SAU',v:8.4} },
+      { 2011: {c:'THA',v:-2.4}, 2012: {c:'THA',v:34.9}, 2013: {c:'EGY',v:8.2}, 2014: {c:'THA',v:16.8}, 2015: {c:'TWN',v:-11.0}, 2016: {c:'TWN',v:19.6}, 2017: {c:'TUR',v:39.1}, 2018: {c:'CZE',v:-2.2}, 2019: {c:'COL',v:31.2}, 2020: {c:'MYS',v:3.7}, 2021: {c:'IND',v:26.7}, 2022: {c:'THA',v:5.3}, 2023: {c:'CZE',v:39.1}, 2024: {c:'PER',v:15.8}, 2025: {c:'POL',v:76.3}, ann: {c:'PER',v:6.7} },
+      { 2011: {c:'COL',v:-5.0}, 2012: {c:'MEX',v:29.1}, 2013: {c:'MYS',v:7.7}, 2014: {c:'QAT',v:16.6}, 2015: {c:'SAU',v:-12.7}, 2016: {c:'ZAF',v:18.4}, 2017: {c:'CZE',v:38.9}, 2018: {c:'THA',v:-5.3}, 2019: {c:'BRA',v:26.7}, 2020: {c:'SAU',v:0.9}, 2021: {c:'MEX',v:22.9}, 2022: {c:'IDN',v:4.2}, 2023: {c:'PER',v:36.6}, 2024: {c:'HUN',v:14.0}, 2025: {c:'CZE',v:74.4}, ann: {c:'KOR',v:6.2} },
+      { 2011: {c:'CZE',v:-5.0}, 2012: {c:'ARE',v:27.4}, 2013: {c:'KWT',v:5.6}, 2014: {c:'ARE',v:13.7}, 2015: {c:'MEX',v:-14.2}, 2016: {c:'IDN',v:17.5}, 2017: {c:'IND',v:38.8}, 2018: {c:'MYS',v:-6.0}, 2019: {c:'CHN',v:23.7}, 2020: {c:'ARE',v:-0.9}, 2021: {c:'QAT',v:15.2}, 2022: {c:'GRC',v:0.4}, 2023: {c:'BRA',v:33.4}, 2024: {c:'IND',v:12.4}, 2025: {c:'CHL',v:73.6}, ann: {c:'IND',v:5.8} },
+      { 2011: {c:'KOR',v:-11.8}, 2012: {c:'IND',v:26.0}, 2013: {c:'KOR',v:4.2}, 2014: {c:'PER',v:10.5}, 2015: {c:'EM',v:-14.6}, 2016: {c:'CHL',v:16.8}, 2017: {c:'PER',v:38.4}, 2018: {c:'HUN',v:-6.1}, 2019: {c:'HUN',v:19.4}, 2020: {c:'MEX',v:-1.6}, 2021: {c:'HUN',v:12.1}, 2022: {c:'MEX',v:-1.6}, 2023: {c:'TWN',v:31.3}, 2024: {c:'KWT',v:10.5}, 2025: {c:'PER',v:73.6}, ann: {c:'EM',v:5.6} },
+      { 2011: {c:'MEX',v:-12.1}, 2012: {c:'CHN',v:23.1}, 2013: {c:'CHN',v:4.0}, 2014: {c:'TWN',v:10.1}, 2015: {c:'KWT',v:-16.2}, 2016: {c:'ARE',v:13.6}, 2017: {c:'EM',v:37.8}, 2018: {c:'IND',v:-7.3}, 2019: {c:'EM',v:18.9}, 2020: {c:'QAT',v:-2.4}, 2021: {c:'POL',v:9.0}, 2022: {c:'EM',v:-2.2}, 2023: {c:'KOR',v:23.6}, 2024: {c:'COL',v:9.8}, 2025: {c:'MEX',v:56.9}, ann: {c:'KWT',v:5.5} },
+      { 2011: {c:'ZAF',v:-14.4}, 2012: {c:'HUN',v:22.8}, 2013: {c:'POL',v:3.6}, 2014: {c:'CHN',v:8.3}, 2015: {c:'CZE',v:-16.6}, 2016: {c:'EM',v:11.6}, 2017: {c:'ZAF',v:36.8}, 2018: {c:'ARE',v:-7.7}, 2019: {c:'KOR',v:13.1}, 2020: {c:'CZE',v:-2.8}, 2021: {c:'GRC',v:8.2}, 2022: {c:'ZAF',v:-3.0}, 2023: {c:'IND',v:21.3}, 2024: {c:'GRC',v:9.2}, 2025: {c:'EGY',v:55.0}, ann: {c:'ZAF',v:4.6} },
+      { 2011: {c:'KWT',v:-17.0}, 2012: {c:'KOR',v:21.5}, 2013: {c:'MEX',v:0.2}, 2014: {c:'ZAF',v:5.7}, 2015: {c:'CHL',v:-16.9}, 2016: {c:'SAU',v:10.3}, 2017: {c:'THA',v:34.9}, 2018: {c:'TWN',v:-8.2}, 2019: {c:'MEX',v:11.8}, 2020: {c:'PHL',v:-2.9}, 2021: {c:'EGY',v:7.6}, 2022: {c:'SAU',v:-5.0}, 2023: {c:'COL',v:15.0}, 2024: {c:'EM',v:8.1}, 2025: {c:'BRA',v:50.4}, ann: {c:'QAT',v:4.4} },
+      { 2011: {c:'ARE',v:-17.6}, 2012: {c:'PER',v:20.2}, 2013: {c:'PHL',v:-2.0}, 2014: {c:'EM',v:-1.8}, 2015: {c:'ARE',v:-17.9}, 2016: {c:'KOR',v:9.3}, 2017: {c:'GRC',v:29.1}, 2018: {c:'IDN',v:-8.7}, 2019: {c:'TUR',v:11.7}, 2020: {c:'ZAF',v:-3.5}, 2021: {c:'ZAF',v:4.3}, 2022: {c:'COL',v:-5.0}, 2023: {c:'SAU',v:10.9}, 2024: {c:'ZAF',v:7.4}, 2025: {c:'TWN',v:39.8}, ann: {c:'CHN',v:4.1} },
+      { 2011: {c:'EM',v:-18.2}, 2012: {c:'ZAF',v:19.0}, 2013: {c:'EM',v:-2.3}, 2014: {c:'CZE',v:-2.4}, 2015: {c:'IDN',v:-19.1}, 2016: {c:'QAT',v:6.3}, 2017: {c:'TWN',v:28.5}, 2018: {c:'COL',v:-11.4}, 2019: {c:'PHL',v:11.0}, 2020: {c:'CHL',v:-4.1}, 2021: {c:'IDN',v:2.6}, 2022: {c:'MYS',v:-5.8}, 2023: {c:'EM',v:10.3}, 2024: {c:'CZE',v:6.9}, 2025: {c:'EM',v:34.4}, ann: {c:'MEX',v:3.7} },
+      { 2011: {c:'CHN',v:-18.2}, 2012: {c:'EM',v:18.6}, 2013: {c:'IND',v:-3.8}, 2014: {c:'SAU',v:-2.7}, 2015: {c:'QAT',v:-19.5}, 2016: {c:'KWT',v:3.7}, 2017: {c:'PHL',v:25.2}, 2018: {c:'POL',v:-12.5}, 2019: {c:'ZAF',v:10.7}, 2020: {c:'PER',v:-4.7}, 2021: {c:'THA',v:-1.1}, 2022: {c:'ARE',v:-6.2}, 2023: {c:'IDN',v:8.4}, 2024: {c:'QAT',v:6.1}, 2025: {c:'CHN',v:31.4}, ann: {c:'THA',v:3.3} },
+      { 2011: {c:'CHL',v:-20.0}, 2012: {c:'TWN',v:17.7}, 2013: {c:'ZAF',v:-5.8}, 2014: {c:'KWT',v:-3.9}, 2015: {c:'MYS',v:-20.1}, 2016: {c:'CHN',v:1.1}, 2017: {c:'MYS',v:25.1}, 2018: {c:'EGY',v:-13.7}, 2019: {c:'THA',v:9.8}, 2020: {c:'IDN',v:-7.5}, 2021: {c:'EM',v:-2.2}, 2022: {c:'QAT',v:-6.9}, 2023: {c:'CHL',v:6.4}, 2024: {c:'THA',v:1.6}, 2025: {c:'ARE',v:26.7}, ann: {c:'PHL',v:3.2} },
+      { 2011: {c:'TWN',v:-20.2}, 2012: {c:'MYS',v:14.3}, 2013: {c:'HUN',v:-5.8}, 2014: {c:'MEX',v:-9.2}, 2015: {c:'THA',v:-23.3}, 2016: {c:'POL',v:0.7}, 2017: {c:'IDN',v:24.8}, 2018: {c:'EM',v:-14.3}, 2019: {c:'IDN',v:9.7}, 2020: {c:'TUR',v:-8.6}, 2021: {c:'PHL',v:-3.5}, 2022: {c:'IND',v:-7.5}, 2023: {c:'PHL',v:4.3}, 2024: {c:'SAU',v:0.8}, 2025: {c:'KWT',v:23.3}, ann: {c:'POL',v:2.8} },
+      { 2011: {c:'PER',v:-21.4}, 2012: {c:'SAU',v:10.8}, 2013: {c:'CZE',v:-8.1}, 2014: {c:'MYS',v:-10.7}, 2015: {c:'EGY',v:-23.5}, 2016: {c:'IND',v:-1.4}, 2017: {c:'BRA',v:24.5}, 2018: {c:'MEX',v:-15.3}, 2019: {c:'IND',v:7.6}, 2020: {c:'KWT',v:-10.0}, 2021: {c:'MYS',v:-6.2}, 2022: {c:'CZE',v:-12.2}, 2023: {c:'ZAF',v:2.3}, 2024: {c:'PHL',v:0.0}, 2025: {c:'MYS',v:15.5}, ann: {c:'COL',v:2.6} },
+      { 2011: {c:'BRA',v:-21.6}, 2012: {c:'CHL',v:8.3}, 2013: {c:'THA',v:-14.3}, 2014: {c:'KOR',v:-10.7}, 2015: {c:'POL',v:-24.9}, 2016: {c:'CZE',v:-2.5}, 2017: {c:'KWT',v:18.7}, 2018: {c:'PHL',v:-16.1}, 2019: {c:'CZE',v:6.6}, 2020: {c:'POL',v:-11.3}, 2021: {c:'KOR',v:-7.9}, 2022: {c:'PHL',v:-13.5}, 2023: {c:'QAT',v:1.6}, 2024: {c:'POL',v:-5.7}, 2025: {c:'QAT',v:7.5}, ann: {c:'IDN',v:1.3} },
+      { 2011: {c:'POL',v:-29.5}, 2012: {c:'GRC',v:5.7}, 2013: {c:'BRA',v:-15.8}, 2014: {c:'CHL',v:-12.2}, 2015: {c:'ZAF',v:-25.1}, 2016: {c:'MYS',v:-3.9}, 2017: {c:'COL',v:16.3}, 2018: {c:'CHN',v:-18.8}, 2019: {c:'PER',v:4.8}, 2020: {c:'THA',v:-11.4}, 2021: {c:'COL',v:-13.7}, 2022: {c:'CHN',v:-21.8}, 2023: {c:'ARE',v:0.6}, 2024: {c:'CHL',v:-6.1}, 2025: {c:'THA',v:7.3}, ann: {c:'MYS',v:1.2} },
+      { 2011: {c:'HUN',v:-33.7}, 2012: {c:'IDN',v:5.2}, 2013: {c:'COL',v:-21.1}, 2014: {c:'POL',v:-13.6}, 2015: {c:'TUR',v:-31.6}, 2016: {c:'PHL',v:-6.1}, 2017: {c:'MEX',v:16.3}, 2018: {c:'CHL',v:-18.9}, 2019: {c:'ARE',v:4.0}, 2020: {c:'HUN',v:-11.7}, 2021: {c:'CHL',v:-15.1}, 2022: {c:'EGY',v:-22.5}, 2023: {c:'MYS',v:-3.5}, 2024: {c:'IDN',v:-11.9}, 2025: {c:'IND',v:4.3}, ann: {c:'CHL',v:-0.1} },
+      { 2011: {c:'TUR',v:-35.2}, 2012: {c:'CZE',v:3.5}, 2013: {c:'CHL',v:-21.4}, 2014: {c:'BRA',v:-13.7}, 2015: {c:'PER',v:-31.7}, 2016: {c:'TUR',v:-8.1}, 2017: {c:'SAU',v:7.6}, 2018: {c:'KOR',v:-20.5}, 2019: {c:'QAT',v:-1.0}, 2020: {c:'COL',v:-18.5}, 2021: {c:'BRA',v:-17.2}, 2022: {c:'POL',v:-26.8}, 2023: {c:'TUR',v:-5.3}, 2024: {c:'KOR',v:-23.1}, 2025: {c:'PHL',v:0.5}, ann: {c:'BRA',v:-0.3} },
+      { 2011: {c:'IND',v:-37.2}, 2012: {c:'KWT',v:0.6}, 2013: {c:'IDN',v:-23.1}, 2014: {c:'COL',v:-19.8}, 2015: {c:'BRA',v:-41.2}, 2016: {c:'MEX',v:-9.0}, 2017: {c:'EGY',v:5.2}, 2018: {c:'ZAF',v:-24.3}, 2019: {c:'MYS',v:-2.0}, 2020: {c:'BRA',v:-18.9}, 2021: {c:'PER',v:-19.9}, 2022: {c:'KOR',v:-28.9}, 2023: {c:'KWT',v:-7.5}, 2024: {c:'MEX',v:-26.8}, 2025: {c:'IDN',v:-1.7}, ann: {c:'EGY',v:-0.4} },
+      { 2011: {c:'EGY',v:-46.9}, 2012: {c:'BRA',v:0.3}, 2013: {c:'TUR',v:-26.5}, 2014: {c:'HUN',v:-27.4}, 2015: {c:'COL',v:-41.8}, 2016: {c:'EGY',v:-11.4}, 2017: {c:'ARE',v:2.9}, 2018: {c:'GRC',v:-36.7}, 2019: {c:'POL',v:-5.3}, 2020: {c:'EGY',v:-22.2}, 2021: {c:'CHN',v:-21.6}, 2022: {c:'TWN',v:-29.1}, 2023: {c:'THA',v:-10.3}, 2024: {c:'BRA',v:-29.5}, 2025: {c:'TUR',v:-1.9}, ann: {c:'TUR',v:-1.9} },
+      { 2011: {c:'GRC',v:-62.7}, 2012: {c:'QAT',v:-2.1}, 2013: {c:'PER',v:-29.8}, 2014: {c:'GRC',v:-39.9}, 2015: {c:'GRC',v:-61.3}, 2016: {c:'GRC',v:-11.9}, 2017: {c:'QAT',v:-11.5}, 2018: {c:'TUR',v:-41.1}, 2019: {c:'CHL',v:-16.0}, 2020: {c:'GRC',v:-26.7}, 2021: {c:'TUR',v:-27.8}, 2022: {c:'HUN',v:-31.1}, 2023: {c:'CHN',v:-11.0}, 2024: {c:'EGY',v:-31.1}, 2025: {c:'SAU',v:-4.9}, ann: {c:'GRC',v:-2.5} },
+    ];
+
+    const years = [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 'ann'];
+    let selectedCountry = null;
+
+    function getBackgroundColor(val) {
+      if (val >= 80) return '#14532d';
+      if (val >= 50) return '#166534';
+      if (val >= 30) return '#22c55e';
+      if (val >= 20) return '#4ade80';
+      if (val >= 10) return '#86efac';
+      if (val >= 5) return '#bbf7d0';
+      if (val >= 0) return '#dcfce7';
+      if (val >= -5) return '#fee2e2';
+      if (val >= -10) return '#fecaca';
+      if (val >= -15) return '#fca5a5';
+      if (val >= -20) return '#f87171';
+      if (val >= -30) return '#ef4444';
+      if (val >= -40) return '#dc2626';
+      if (val >= -50) return '#b91c1c';
+      return '#7f1d1d';
+    }
+
+    function getTextColor(val) {
+      if (val >= 30 || val <= -15) return '#fff';
+      return '#1f2937';
+    }
+
+    function renderTable() {
+      const table = document.getElementById('emTable');
+      let html = '<thead><tr>';
+      
+      years.forEach(year => {
+        html += `<th>${year === 'ann' ? 'Ann.' : year}</th>`;
+      });
+      html += '</tr></thead><tbody>';
+
+      rowData.forEach((row, rowIdx) => {
+        html += '<tr>';
+        years.forEach(year => {
+          const cell = row[year];
+          if (cell) {
+            const isHighlighted = !selectedCountry || cell.c === selectedCountry;
+            const bgColor = isHighlighted ? getBackgroundColor(cell.v) : '#3d3d3d';
+            const textColor = isHighlighted ? getTextColor(cell.v) : '#777';
+            const dimClass = (!selectedCountry || cell.c === selectedCountry) ? '' : 'dimmed';
+            const selectedClass = selectedCountry === cell.c ? 'selected' : '';
+            const returnStr = cell.v > 0 ? `+${cell.v.toFixed(1)}%` : `${cell.v.toFixed(1)}%`;
+            
+            html += `<td class="${dimClass} ${selectedClass}" 
+                        style="background:${bgColor};color:${textColor}" 
+                        data-country="${cell.c}"
+                        onclick="toggleCountry('${cell.c}')">
+                      <div class="country">${cell.c}</div>
+                      <div class="return-val">${returnStr}</div>
+                    </td>`;
+          } else {
+            html += '<td></td>';
+          }
+        });
+        html += '</tr>';
+      });
+
+      html += '</tbody>';
+      table.innerHTML = html;
+    }
+
+    function toggleCountry(country) {
+      selectedCountry = selectedCountry === country ? null : country;
+      renderTable();
+      updateIndicator();
+    }
+
+    function updateIndicator() {
+      const indicator = document.getElementById('selectedIndicator');
+      if (selectedCountry) {
+        indicator.innerHTML = `<span class="selected-badge">🎯 ${selectedCountry} 선택됨 (다시 클릭하여 해제)</span>`;
+      } else {
+        indicator.innerHTML = '';
+      }
+    }
+
+    // 초기 렌더링
+    renderTable();
+  </script>
+</body>
+</html>
